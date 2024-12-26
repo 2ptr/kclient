@@ -1,17 +1,19 @@
-use crypto::rc4::Rc4;
-use crypto::symmetriccipher::SynchronousStreamCipher;
 
-/*
-    encrypt_with_rc4 : Return u8 byte vector of RC4-encrypted input data.
-    This is used in the encryption of timestamps for Kerberos.
- */
-fn encrypt_with_rc4(key: &[u8], data: &[u8]) -> Vec<u8> {
-    // Create an RC4 cipher with the given key
-    let mut rc4 = Rc4::new(key);
+// Creates the AES salt from the realm and the client name
+pub fn gen_256_salt(realm: &str, client_name: &str) -> Vec<u8> {
+    let mut salt = realm.to_uppercase();
+    let mut lowercase_username = client_name.to_lowercase();
 
-    // Encrypt the data
-    let mut result : Vec<u8> = vec![];
-    let encrypted_data = rc4.process(data, &mut result);
+    if lowercase_username.ends_with("$") {
+        // client name = "host<client_name>.lower.domain.com"
+        salt.push_str("host");
+        lowercase_username.pop();
+        salt.push_str(&lowercase_username);
+        salt.push('.');
+        salt.push_str(&realm.to_lowercase());
+    } else {
+        salt.push_str(&lowercase_username);
+    }
 
-    result
+    return salt.as_bytes().to_vec();
 }

@@ -4,7 +4,5 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-md4 = "0.10.2"
 rust-crypto="0.2.36"
-ntlm-hash = "0.1.0"
-hex = "0.4.3"
+kerberos_crypto = "0.3.6"
